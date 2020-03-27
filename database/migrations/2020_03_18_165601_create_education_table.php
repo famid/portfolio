@@ -15,6 +15,11 @@ class CreateEducationTable extends Migration
     {
         Schema::create('education', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('institution', 50);
+            $table->string('subject', 50);
+            $table->date('started_at');
+            $table->date('ended_at');
+            $table->enum('educational_status',['Hsc Passed','Bsc Passed', 'Studying','Dropped Out'])->default('Studying');
             $table->timestamps();
         });
     }
