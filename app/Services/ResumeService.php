@@ -44,6 +44,19 @@ class ResumeService
             return ['success'=>false, 'message'=>'resume not found'];
         }
     }
+    public function getResumeFile (int $resumeId) :array {
+        try{
+            $resume = Resume::find ($resumeId);
+            if(is_null($resume)){
+                return ['success'=>false,'message'=>'resume file not found'];
+            }
+            $resumeFile = $resume->file;
+
+            return ['success'=>true,'data'=>$resumeFile];
+        }catch (\Exception $e){
+            return $this->errorResponse;
+        }
+    }
     public function create (string $title, string $file) :array {
         try{
             Resume::create([

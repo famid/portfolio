@@ -25,6 +25,28 @@
                             </div>
                         </form>
                     </div>
+                    @foreach($data['resumes']->chunk(3) as $chunkData)
+                        <div class="row">
+                            @foreach($chunkData as $resume)
+                                <div class="col-md-4 col-sm-12 col-lg-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            {{$resume->title}}
+                                        </div>
+                                        <div class="card-body">
+
+                                            <p class="card-text">
+                                                <a href="{{route('downloadResumeFile', ['id' => $resume->id])}}">
+                                                    <i class="fa fa-download"></i>
+                                                    Download File
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
 
                 </div>
 

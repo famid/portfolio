@@ -26,8 +26,10 @@
                                 <p class="card-text">
                                     <span  style="color: #1d643b;">Date </span>: {{$achievement->date}} <br>
                                     <span  style="color: #1d643b;">Description </span>: {{$achievement->description}} <br>
-                                    <span  style="color: #1d643b;">File </span>: {{$achievement->file}}
-
+                                    <a href="{{route('downloadAchievementFile', ['id' => $achievement->id])}}">
+                                        <i class="fa fa-download"></i>
+                                        Download File
+                                    </a>
                                 </p>
                                 <a href="{{route('editAchievement', ['id' =>$achievement->id])}}">
                                     <i class="fa fa-minus"></i>EDIT

@@ -44,6 +44,19 @@ class AchievementService
         }
     }
 
+    public function getAchievementFile (int $achievementId) :array {
+        try{
+            $achievementFile = Achievement::find($achievementId)->file;
+            if(is_null($achievementFile)){
+                return ['success'=>false,'message'=>'Achievement file not found'];
+            }
+            return ['success'=>true ,'data'=>$achievementFile];
+        }catch (\Exception $e){
+            return $this->errorResponse;
+
+        }
+    }
+
     /**
      * @param string $title
      * @param string $date
@@ -51,7 +64,7 @@ class AchievementService
      * @param string $file
      * @return array
      */
-    public function create (string $title, string $date, string $description, string $file) :array {
+    public function create (string $title, string $date, string $description, string $file=null) :array {
         try{
             Achievement::create([
                 'title'=>$title,

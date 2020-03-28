@@ -81,6 +81,7 @@ Route::middleware(['admin'])->namespace('Admin')->prefix('AQ76la03Ww27y2K0OXyFQW
     Route::get('/delete-achievement/id', 'AchievementController@deleteAchievement')->name('deleteAchievement');
     Route::get('/edit-achievement/id', 'AchievementController@editAchievement')->name('editAchievement');
     Route::post('/update-achievement/id', 'AchievementController@updateAchievement')->name('updateAchievement');
+    Route::get('/download-achievement-file/id', 'AchievementController@downloadAchievementFile')->name('downloadAchievementFile');
     /*
      * -------------------------------------------------
      * RESUME ROUTES
@@ -88,6 +89,7 @@ Route::middleware(['admin'])->namespace('Admin')->prefix('AQ76la03Ww27y2K0OXyFQW
      * */
     Route::get('/resume-list', 'ResumeController@resumeList')->name('resumeList');
     Route::post('/create-resume', 'ResumeController@createResume')->name('createResume');
+    Route::get('/download-resume-file/id', 'ResumeController@downloadResumeFile')->name('downloadResumeFile');
     /*
         * -------------------------------------------------
         * EDUCATION ROUTES

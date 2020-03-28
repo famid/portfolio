@@ -10,7 +10,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="{{route('createAchievement')}}" method="post">
+                        <form action="{{route('createAchievement')}}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group">
                                 <label for="inputTitle">Title</label>

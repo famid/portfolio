@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Services\AchievementService;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 class AchievementController extends Controller
 {
@@ -20,7 +24,7 @@ class AchievementController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function achievementList () {
         $data['achievements'] = $this->achievementService->achievements();
@@ -28,7 +32,7 @@ class AchievementController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function showCreateAchievement () {
         return view('admin.achievement.createAchievement');
@@ -36,31 +40,48 @@ class AchievementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function createAchievement (Request $request) {
         $rules = [
             'title'=>'required|max:50',
             'date' =>'required|date|date_format:Y-m-d',
             'description'=> 'required:max:300',
-             'file'=>'nullable'
+            'file'=>'nullable|max:10000|mimes:doc,docx,pdf' // max 10000kb, doc or docx or pdf file'
         ];
         $validator = Validator::make($request->all(), $rules);
         if($validator->fails()){
             return redirect()->route('achievementList')->with('error', $validator->errors()->first());
+        }
+        if ($request->has('file') && is_file($request->file)) {
+            $file = $request->file('file');
+            $fileUploadResponse = fileUpload($file);
+            if (!$fileUploadResponse['success']) {
+                return redirect()->back();
+            } else {
+                $fileNameToStore = $fileUploadResponse['fileName'];
+                $path = $file->storeAs('public/achievement_files', $fileNameToStore);
+            }
+        } else {
+            $fileNameToStore = null;
         }
         $date = Carbon::parse($request->date);
         $createAchievementResponse = $this->achievementService->create(
             $request->title,
             $date,
             $request->description,
-            $request->file ? $request->file:''
+            $fileNameToStore
         );
         if(!$createAchievementResponse['success']){
             return redirect()->route('achievementList')->with('error',$createAchievementResponse['message']);
         }
         return redirect()->route('achievementList')->with('error',$createAchievementResponse['message']);
     }
+
+    /**
+     * @param Request $request
+     * @return Factory|RedirectResponse|Redirector|View
+     */
     public function editAchievement (Request $request) {
         try {
             $achievement = $this->achievementService->achievement($request->id);
@@ -76,7 +97,7 @@ class AchievementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updateAchievement (Request $request) {
         $rules = [
@@ -107,7 +128,7 @@ class AchievementController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function deleteAchievement(Request $request) {
         $rules = [
@@ -124,5 +145,16 @@ class AchievementController extends Controller
         }
         return redirect()->route('achievementList')->with('success',$deleteAchievementResponse['message']);
 
+    }
+
+    public function downloadAchievementFile(Request $request) {
+        $fileNameResponse = $this->achievementService->getAchievementFile($request->id);
+        if (!$fileNameResponse['success']) {
+            return redirect()->back()->with('error', $fileNameResponse['message']);
+        }
+        $fileName = $fileNameResponse['data'];
+        $filePath= storage_path().'/app/public/achievement_files/'.$fileName;
+
+        return response()->download($filePath);
     }
 }
